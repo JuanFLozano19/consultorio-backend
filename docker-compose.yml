@@ -1,0 +1,31 @@
+# Desarrollo local: base de datos PostgreSQL + API.
+#   docker compose up -d db        -> solo la base de datos (y corres la API desde el IDE)
+#   docker compose up --build      -> base de datos + API
+services:
+  db:
+    image: postgres:16
+    container_name: consultorio-db
+    environment:
+      POSTGRES_DB: consultorio
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - consultorio-data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: consultorio-backend
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/consultorio
+    restart: unless-stopped
+
+volumes:
+  consultorio-data:
