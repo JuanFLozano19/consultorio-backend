@@ -74,7 +74,17 @@ Para el aviso por correo de nuevas citas: `NOTIFICACION_CORREO`, `MAIL_USERNAME`
 - **API:** Render o Railway con el `Dockerfile` incluido. Health check en `/actuator/health`.
 - Configurar `CORS_ALLOWED_ORIGINS` con el dominio del frontend.
 
-## Flujo de trabajo
+## Ramas y flujo de trabajo
 
-- `main` = producción, `develop` = integración. Ramas `feature/...` con Pull Request.
-- GitHub Actions (`.github/workflows/ci.yml`) compila y corre las pruebas en cada push y PR.
+| Rama            | Para qué                                                     |
+| --------------- | ------------------------------------------------------------ |
+| `main`          | Producción: lo que ve el público. Solo recibe desde `preproduccion`. |
+| `preproduccion` | Pruebas finales y aprobación del doctor antes de publicar.   |
+| `desarrollo`    | Integración del trabajo diario.                              |
+
+1. Crear una rama desde `desarrollo`: `git switch desarrollo && git pull && git switch -c feature/mi-cambio`
+2. Pull Request de `feature/...` → `desarrollo`.
+3. Cuando un grupo de cambios está listo: Pull Request `desarrollo` → `preproduccion` y se revisa.
+4. Aprobado: Pull Request `preproduccion` → `main` (publica).
+
+GitHub Actions (`.github/workflows/ci.yml`) compila y corre las pruebas en cada push y Pull Request de las tres ramas.
